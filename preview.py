@@ -3,18 +3,36 @@
 import sys
 import time
 import math
+import argparse
+import inspect
 
 import pygame
 
 import shaders
 
-CHANNELS_ACTIVE=13
+CHANNELS_ACTIVE = 13
 
 WIDTH = 300
 HEIGHT = 800
 
 
-SHADER = shaders.smooth_colors
+def get_shaders():
+    return {name: proc
+            for name, proc in inspect.getmembers(shaders, inspect.isfunction)
+            if not name.startswith("_")}
+
+
+def list_shaders(shaders_available):
+    print("Shaders available:")
+    for name, _ in shaders_available.items():
+        print("    {}".format(name))
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--shader")
+
+    return parser.parse_args()
 
 
 def draw_strip(ctx, i, color):
@@ -47,7 +65,14 @@ def render(ctx, t, proc):
         draw_strip(ctx, i, color)
 
 
-def main():
+def main(args):
+    shaders_available = get_shaders()
+    shader = shaders_available.get(args.shader)
+
+    if not shader:
+        list_shaders(shaders_available)
+        return
+
     pygame.init()
 
     display = pygame.display.set_mode((300, 800), 0, 32)
@@ -62,10 +87,12 @@ def main():
 
         t = time.time() - t0
         display.fill((0,0,0))
-        render(display, t, SHADER)
+        render(display, t, shader)
         pygame.display.update()
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+
+    main(args)
 

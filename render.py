@@ -1,23 +1,43 @@
+#!/usr/bin/env python3
 
 """
 Initial implementation in python
 """
 
 import time
+import inspect
+import argparse
 
 import serial
 
-SERIAL_PORT="/dev/ttyUSB1"
-SERIAL_BAUD=1000000
+import shaders
 
 
-CHANNELS_ACTIVE=13
-CHANNELS_AVAILABLE=16
+SERIAL_PORT_DEFAULT = "/dev/ttyUSB0"
+SERIAL_BAUD_DEFAULT = 1000000
+
+CHANNELS_ACTIVE = 13
+CHANNELS_AVAILABLE = 16
 
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--shader")
+    parser.add_argument("-p", "--serial-port", default=SERIAL_PORT_DEFAULT)
+    parser.add_argument("-b", "--baudrate", default=SERIAL_BAUD_DEFAULT)
 
-def _int_to_big_endian(n):
-    """Encode n as big endian"""
+    return parser.parse_args()
+
+def get_shaders():
+    return {name: proc
+            for name, proc in inspect.getmembers(shaders, inspect.isfunction)
+            if not name.startswith("_")}
+
+
+def list_shaders(shaders_available):
+    print("Shaders available:")
+    for name, _ in shaders_available.items():
+        print("    {}".format(name))
 
 
 def _encode_rgbw_8(rgbw):
@@ -105,15 +125,21 @@ def render_loop(conn, shader):
         frame = encode_frame(rgbw_data)
         update(conn, frame)
 
-        time.sleep(1.0/60.0)
+        time.sleep(1.0/40.0)
 
-def main():
-    conn = serial.Serial(SERIAL_PORT, SERIAL_BAUD)
+def main(args):
+    shaders_available = get_shaders()
+    shader = shaders_available.get(args.shader)
+    if not shader:
+        list_shaders(shaders_available)
+        return
 
-    render_loop(conn, shaders.smooth_colors)
+    conn = serial.Serial(args.serial_port, args.baudrate)
+    render_loop(conn, shader)
 
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    main(args)
 
