@@ -1,7 +1,7 @@
 import math
 
 def smooth_white(i, t):
-    offset = (i / 6.0) * (math.pi)
+    offset = (i / 6.5) * (math.pi)
 
     r = 0.5 + 0.5 * math.cos(2.0 * t + offset)
     g = 0.5 + 0.5 * math.cos(2.0 * t + offset)
@@ -11,7 +11,7 @@ def smooth_white(i, t):
     return (r, g, b, w)
 
 def smooth_colors(i, t):
-    offset = (i / 6.0) * (math.pi)
+    offset = (i / 6.5) * (math.pi)
 
     r = 0.5 + 0.5 * math.cos(2.0 * t + 2 + offset)
     g = 0.5 + 0.5 * math.cos(2.0 * t + 3 + offset)
