@@ -107,21 +107,10 @@ def render_loop(conn, shader):
 
         time.sleep(1.0/60.0)
 
-
-def smooth_colors(i, t):
-
-    r = 0.5 + 0.5 * math.sin(t * 0.5 + i * math.pi/4)
-    g = 0.5 + 0.5 * math.sin(t * 0.5 + i * math.pi/3)
-    b = 0.5 + 0.5 * math.sin(t * 0.5 + i * math.pi/2)
-    w = 0.5 + 0.5 * math.sin(t * 0.5 + i * math.pi/1)
-
-    return (r, g, b, w)
-
-
 def main():
     conn = serial.Serial(SERIAL_PORT, SERIAL_BAUD)
 
-    render_loop(conn, smooth_colors)
+    render_loop(conn, shaders.smooth_colors)
 
 
 
