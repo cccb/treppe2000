@@ -23,7 +23,7 @@ def smooth_colors(state):
 
 
 
-def color_flow(i, t):
+def color_flow(state):
 
     p_r = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.5 * state.t))
     p_g = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.5 * state.t + 1.0))
@@ -33,13 +33,13 @@ def color_flow(i, t):
     g = 0.0
     b = 0.0
 
-    if abs(i - p_r) < 0.5:
+    if abs(state.v - p_r) < 0.5:
         r = 1.0
 
-    if abs(i - p_g) < 0.5:
+    if abs(state.v - p_g) < 0.5:
         g = 1.0
 
-    if abs(i - p_b) < 0.5:
+    if abs(state.v - p_b) < 0.5:
         b = 1.0
 
     return (r, g, b, 0.1)
