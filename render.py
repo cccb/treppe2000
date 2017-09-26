@@ -12,6 +12,8 @@ import serial
 
 from shaders import procs, state
 
+import binascii
+
 
 SERIAL_PORT_DEFAULT = "/dev/ttyUSB0"
 SERIAL_BAUD_DEFAULT = 1000000
@@ -51,19 +53,19 @@ def _encode_rgbw_8(rgbw):
 
 
 def _encode_rgbw_10(rgbw):
-    """Encode rgbw value as big endian"""
-    return round(rgbw[0] * 1024.0).to_bytes(2, "big") + \
-           round(rgbw[1] * 1024.0).to_bytes(2, "big") + \
-           round(rgbw[2] * 1024.0).to_bytes(2, "big") + \
-           round(rgbw[3] * 1024.0).to_bytes(2, "big")
+    """Encode rgbw value as little endian"""
+    return round(rgbw[0] * 1024.0).to_bytes(2, "little") + \
+           round(rgbw[1] * 1024.0).to_bytes(2, "little") + \
+           round(rgbw[2] * 1024.0).to_bytes(2, "little") + \
+           round(rgbw[3] * 1024.0).to_bytes(2, "little")
 
 
 def _encode_rgbw_16(rgbw):
-    """Encode rgbw value as big endian"""
-    return round(rgbw[0] * 65535.0).to_bytes(2, "big") + \
-           round(rgbw[1] * 65535.0).to_bytes(2, "big") + \
-           round(rgbw[2] * 65535.0).to_bytes(2, "big") + \
-           round(rgbw[3] * 65535.0).to_bytes(2, "big")
+    """Encode rgbw value as little endian"""
+    return round(rgbw[0] * 65535.0).to_bytes(2, "little") + \
+           round(rgbw[1] * 65535.0).to_bytes(2, "little") + \
+           round(rgbw[2] * 65535.0).to_bytes(2, "little") + \
+           round(rgbw[3] * 65535.0).to_bytes(2, "little")
 
 
 def _encode_rgbw(rgbw, channel_bits=10):
@@ -120,20 +122,23 @@ def render_loop(conn, shader):
     while True:
         t = time.time() - t0
         # Make shader state
-        s = state.ShaderState(t=t,
-                              u=0,
-                              v=i,
-                              h_res=1,
-                              v_res=CHANNELS_ACTIVE)
+        for i in range(0, CHANNELS_AVAILABLE):
+            s = state.ShaderState(t=t,
+                                  u=0,
+                                  v=i,
+                                  h_res=1,
+                                  v_res=CHANNELS_ACTIVE)
 
-        # draw strip
-        rgbw_data = [shader(s)
-                     for i in range(0, CHANNELS_ACTIVE)]
+            # draw strip
+            rgbw_data = shader(s)
+            frame = bytes([0x23, i]) + _encode_rgbw(rgbw_data, 16)
+            # print(i)
+            # print(i)
+            # print(binascii.hexlify(bytes([0x23, i])))
+            update(conn, frame)
+            # time.sleep(2.0/1000.0)
 
-        frame = encode_frame(rgbw_data)
-        update(conn, frame)
-
-        time.sleep(1.0/40.0)
+        time.sleep(1.0/100.0)
 
 
 def main(args):
