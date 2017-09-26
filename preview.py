@@ -8,7 +8,7 @@ import inspect
 
 import pygame
 
-import shaders
+from shaders import procs, state
 
 CHANNELS_ACTIVE = 13
 
@@ -18,7 +18,7 @@ HEIGHT = 800
 
 def get_shaders():
     return {name: proc
-            for name, proc in inspect.getmembers(shaders, inspect.isfunction)
+            for name, proc in inspect.getmembers(procs, inspect.isfunction)
             if not name.startswith("_")}
 
 
@@ -55,11 +55,19 @@ def _encode_rgbw(rgbw, bits):
             round(rgb[2] * 255.0))
 
 
+
 def render(ctx, t, proc):
 
     for i in range(0, CHANNELS_ACTIVE):
+        # Make shader state
+        s = state.ShaderState(t=t,
+                              u=0,
+                              v=i,
+                              h_res=1,
+                              v_res=CHANNELS_ACTIVE)
+
         # draw strip
-        rgbw = proc(i, t)
+        rgbw = proc(s)
 
         color = _encode_rgbw(rgbw, 8)
         draw_strip(ctx, i, color)

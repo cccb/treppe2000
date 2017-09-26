@@ -10,7 +10,7 @@ import argparse
 
 import serial
 
-import shaders
+from shaders import procs, state
 
 
 SERIAL_PORT_DEFAULT = "/dev/ttyUSB0"
@@ -30,7 +30,7 @@ def parse_args():
 
 def get_shaders():
     return {name: proc
-            for name, proc in inspect.getmembers(shaders, inspect.isfunction)
+            for name, proc in inspect.getmembers(procs, inspect.isfunction)
             if not name.startswith("_")}
 
 
@@ -119,13 +119,22 @@ def render_loop(conn, shader):
 
     while True:
         t = time.time() - t0
-        rgbw_data = [shader(i, t)
+        # Make shader state
+        s = state.ShaderState(t=t,
+                              u=0,
+                              v=i,
+                              h_res=1,
+                              v_res=CHANNELS_ACTIVE)
+
+        # draw strip
+        rgbw_data = [shader(s)
                      for i in range(0, CHANNELS_ACTIVE)]
 
         frame = encode_frame(rgbw_data)
         update(conn, frame)
 
         time.sleep(1.0/40.0)
+
 
 def main(args):
     shaders_available = get_shaders()
