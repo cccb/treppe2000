@@ -8,7 +8,14 @@ def smooth_white(state):
     b = 0.5 + 0.5 * math.cos(2.0 * state.t + offset)
     w = 0.1
 
-    return (r, g, b, w)
+    return (r, r, r, r)
+
+
+
+def const_colors(state):
+    c = [(1,0,0,0), (0,1,0,0), (0,0,1,0), (0,0,0,1)]
+
+    return c[state.v % 4]
 
 
 def smooth_colors(state):
@@ -25,9 +32,9 @@ def smooth_colors(state):
 
 def color_flow(state):
 
-    p_r = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.5 * state.t))
-    p_g = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.5 * state.t + 1.0))
-    p_b = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.5 * state.t + 2.0))
+    p_r = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.0 * state.t))
+    p_g = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.0 * state.t + 1.0))
+    p_b = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.0 * state.t + 2.0))
 
     r = 0.0
     g = 0.0
@@ -43,5 +50,7 @@ def color_flow(state):
         b = 1.0
 
     return (r, g, b, 0.1)
+
+
 
 
