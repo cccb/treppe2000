@@ -21,6 +21,8 @@ SERIAL_BAUD_DEFAULT = 1000000
 CHANNELS_ACTIVE = 13
 CHANNELS_AVAILABLE = 16
 
+CHANNEL_MAPPING = [0,1,2,3,4,5,13,12,11,10,9,8,7,6,14,15]
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -129,14 +131,14 @@ def render_loop(conn, shader):
                                   h_res=1,
                                   v_res=CHANNELS_ACTIVE)
 
-            # draw strip
+            # Map channel
+            channel = CHANNEL_MAPPING[i]
+
+            # Draw strip
             rgbw_data = shader(s)
             frame = bytes([0x23, i]) + _encode_rgbw(rgbw_data, 16)
-            # print(i)
-            # print(i)
-            # print(binascii.hexlify(bytes([0x23, i])))
+
             update(conn, frame)
-            # time.sleep(2.0/1000.0)
 
         time.sleep(1.0/100.0)
 
