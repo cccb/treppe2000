@@ -136,7 +136,7 @@ def render_loop(conn, shader):
 
             # Draw strip
             rgbw_data = shader(s)
-            frame = bytes([0x23, i]) + _encode_rgbw(rgbw_data, 16)
+            frame = bytes([0x23, channel]) + _encode_rgbw(rgbw_data, 16)
 
             update(conn, frame)
 
