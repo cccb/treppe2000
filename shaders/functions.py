@@ -201,7 +201,6 @@ def power_curve(a, b, x):
     return k * pow( x, a ) * pow( 1.0-x, b );
 
 
-
 def linear_window(l, r, x):
     """
     Returns a linear transition between 0 and 1 in a window
@@ -210,6 +209,20 @@ def linear_window(l, r, x):
     if x < l or x > r:
         return 0.0
 
-    width = abs(r - l)
-    return (x - l) / width
+    return (x - l) / abs(r - l)
 
+
+def linear_window_duration(onset, width, x):
+    """
+    Returns a linear transition between 0 and 1 in a window
+    of length width, after onset time.
+    """
+    return linear_window(onset, onset + width, x)
+
+
+def interpolate_cosine(y0, y1, x):
+    """
+    Make a simple cosine interpolation.
+    """
+    x2 = 0.5 * (1.0 - math.cos(x * math.pi))
+    return y0 * (1 - x2) + y1 * x2
