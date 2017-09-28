@@ -201,3 +201,15 @@ def power_curve(a, b, x):
     return k * pow( x, a ) * pow( 1.0-x, b );
 
 
+
+def linear_window(l, r, x):
+    """
+    Returns a linear transition between 0 and 1 in a window
+    of length r - l;
+    """
+    if x < l or x > r:
+        return 0.0
+
+    width = abs(r - l)
+    return (x - l) / width
+
