@@ -20,8 +20,8 @@ SERIAL_BAUD_DEFAULT = 1000000
 
 CHANNELS_ACTIVE = 13
 CHANNELS_AVAILABLE = 16
-
-CHANNEL_MAPPING = [0,1,2,3,4,5,13,12,11,10,9,8,7,6,14,15]
+#                                        x
+CHANNEL_MAPPING = [7,6,5,4,1,0,9,8,11,10,15,14,13,  3,12,2,16]
 
 
 def parse_args():

@@ -13,9 +13,18 @@ def smooth_white(state):
     return (r, r, r, r)
 
 
+def const_step(state):
+    i = 11
+    if state.v == i:
+        return (1.0, 0, 0, 1)
+    if state.v == i + 1:
+        return (0, 1, 1, 0)
+    return (0,0,0,0)
+
+
 
 def const_colors(state):
-    c = [(1,0,0,0), (0,1,0,0), (0,0,1,0), (0,0,0,1)]
+    c = [(0,0,0,0), (0,0,0,0), (0,0,0,0), (0,0,0,0)]
 
     return c[state.v % 4]
 
