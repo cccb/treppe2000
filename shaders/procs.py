@@ -1,5 +1,7 @@
 import math
 
+from shaders import generators
+
 def smooth_white(state):
     offset = (state.v / 6.5) * math.pi
 
@@ -52,5 +54,7 @@ def color_flow(state):
     return (r, g, b, 0.1)
 
 
-
+def pulse_wob(state):
+    base = generators.waber(1, state)
+    return (0,0,0, base)
 

@@ -9,19 +9,16 @@ taking a given amount of time (duration).
 
 import math
 
-def saw(v_min, v_max, duration, t):
+def saw(duration, t):
     """Sawtooth oscillator"""
     x = (t % duration) / duration
 
-    return v_min + x * (v_max - v_min)
+    return x
 
 
-def sine(v_min, v_max, duration, t):
+def sine(duration, t):
     """Sine oscillator"""
-    s = abs(v_min - v_max) / duration
-    v = 0.5 + 0.5 * math.sin(s * t * (math.pi / 2))
-
-    return v
+    return 0
 
 
 def cosine(v_min, v_max, duration, t):
