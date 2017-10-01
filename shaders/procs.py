@@ -105,7 +105,7 @@ def gauge_pulse(state):
 
 
 def pulse_wob(state):
-    blue_base = 0.2 * gen.waber(1, state)
+    blue_base = 0.2 * gen.waber(1, 0, state)
 
     pulse_base = 1.0 - fn.impulse(8,
                                   fn.linear_window_duration(
