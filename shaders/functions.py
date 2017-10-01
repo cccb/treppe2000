@@ -51,7 +51,7 @@ def clamp(l, r, x):
         return l
     if x > r:
         return r
-
+    return x
 
 def step(e, x):
     """
@@ -72,7 +72,7 @@ def smoothstep(e0, e1, x):
     This is useful in cases where you would want a threshold
     function with a smooth transition.
     """
-    x = clamp(0.0, 1.0, (x - l) / (r - l))
+    x = clamp(0.0, 1.0, (x - e0) / (e1 - e0))
     return x**3 * (x * (x * 6 - 15) + 10)
 
 
