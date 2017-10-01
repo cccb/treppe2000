@@ -16,17 +16,14 @@ def saw(duration, t):
     return x
 
 
-def sine(duration, t):
+def sine(freq, t):
     """Sine oscillator"""
-    return 0
+    return 0.5 + 0.5 * math.sin(freq * t)
 
 
-def cosine(v_min, v_max, duration, t):
+def cosine(freq, t):
     """Cosine oscillator"""
-    s = abs(v_min - v_max) / duration
-    v = 0.5 + 0.5 * math.cos(s * t * (math.pi / 2))
-
-    return v
+    return 0.5 + 0.5 * math.cos(freq * t)
 
 
 def linear(v_min, v_max, duration, t):

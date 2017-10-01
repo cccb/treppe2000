@@ -86,15 +86,22 @@ def pulse(state):
 
 def gauge_pulse(state):
 
-    base = 0.2 * gen.waber(1, state)
+    base = 0.2 * gen.waber(1, 0, state)
+    base2 = 0.08 * gen.waber(1, 5, state)
 
-    f0 = fn.impulse(12,  osc.saw(2, state.t))
+    f0 = fn.impulse(12, fn.linear_window_duration(5, 2, state.t % 10))
+    f1 = osc.cosine(8, state.t)
+
+    f1p = fn.mix(0.1, 0.3, f1)
+
+    f3 = fn.clamp(0, 1, f1p + f0)
 
     # Render gauge
-    gauge = gen.gauge(f0, state)
+    gauge = gen.gauge(f3, state)
 
 
-    return (0, 0.8 * gauge, base, 0)
+    # return (0.3 * gauge, 0, 0.2 * gauge + base, base2)
+    return (0, 0.4 * gauge,  0.2 * gauge + base, base2)
 
 
 def pulse_wob(state):
