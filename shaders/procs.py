@@ -1,6 +1,8 @@
 import math
 
-from shaders import generators
+from shaders import oscillators as osc
+from shaders import generators as gen
+from shaders import functions as fn
 
 def smooth_white(state):
     offset = (state.v / 6.5) * math.pi
@@ -63,7 +65,49 @@ def color_flow(state):
     return (r, g, b, 0.1)
 
 
+
+def pulse(state):
+
+    pulse_base = 1.0 - fn.impulse(8,
+                                  fn.linear_window_duration(
+                                    4, 1, state.t % 20.0))
+
+
+    pulse_up = fn.impulse(8, fn.linear_window(pulse_base * state.v_res - 1,
+                                               pulse_base * state.v_res + 8,
+                                               state.v))
+
+    return (pulse_up, 0,0,0)
+
+
+
+
+
+
+def gauge_pulse(state):
+
+    base = 0.2 * gen.waber(1, state)
+
+    f0 = fn.impulse(12,  osc.saw(2, state.t))
+
+    # Render gauge
+    gauge = gen.gauge(f0, state)
+
+
+    return (0, 0.8 * gauge, base, 0)
+
+
 def pulse_wob(state):
-    base = generators.waber(1, state)
-    return (0,0,0, base)
+    blue_base = 0.2 * gen.waber(1, state)
+
+    pulse_base = 1.0 - fn.impulse(8,
+                                  fn.linear_window_duration(
+                                    3, 1, state.t % 10.0))
+
+
+    pulse_up = fn.impulse(8, fn.linear_window(pulse_base * state.v_res - 1,
+                                               pulse_base * state.v_res + 8,
+                                               state.v))
+
+    return (0, 0, blue_base, pulse_up * 0.7)
 

@@ -43,5 +43,17 @@ def waber(freq, state):
     w3 = fn.mix(0.1, 1.0, f3 * s3)
 
 
-    return 0.1 * ( w0 + w1 + w2 + w3)
+    return  w0 + w1 + w2 + w3
+
+
+def gauge(perc, state):
+    """
+    Render a gauge, filled from the bottom
+    """
+    v_perc = 1.0 - (state.v / state.v_res)
+
+    if v_perc <= perc:
+        return 1.0
+
+    return 0.0
 
