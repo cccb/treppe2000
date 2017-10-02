@@ -104,12 +104,35 @@ def gauge_pulse(state):
     return (0, 0.4 * gauge,  0.2 * gauge + base, base2)
 
 
+
+def flow_pulse(state):
+    pulse_len = 5.5
+
+    blue_base = 0.2 * gen.waber(1, 0, state)
+
+    # hull parabola / outer fade
+    f_hull = fn.linear_window(-2, state.v_res + 1, state.v)
+    hull = fn.mix(0.1, 1.0, fn.parabola(8, f_hull))
+
+    # flowing pulse
+    v_pos = fn.linear_window_duration(1, pulse_len, state.t % (pulse_len * 1.5)) * (state.v_res + 8)
+    f_pulse = fn.linear_window(-8 + v_pos, 0 + v_pos, state.v)
+    pulse = fn.parabola(4, f_pulse) * hull
+
+    # flowing pulse
+    v_pos2 = fn.linear_window_duration(1.4, pulse_len, state.t % (pulse_len * 1.5)) * (state.v_res + 8)
+    f_pulse2 = fn.linear_window(-8 + v_pos2, 0 + v_pos2, state.v)
+    pulse2 = fn.parabola(4, f_pulse2) * hull
+
+    return (0, pulse2, blue_base, pulse)
+
+
 def pulse_wob(state):
     blue_base = 0.2 * gen.waber(1, 0, state)
 
     pulse_base = 1.0 - fn.impulse(8,
                                   fn.linear_window_duration(
-                                    3, 1, state.t % 10.0))
+                                    4, 1, state.t % 10.0))
 
 
     pulse_up = fn.impulse(8, fn.linear_window(pulse_base * state.v_res - 1,
