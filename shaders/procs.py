@@ -66,6 +66,27 @@ def color_flow(state):
 
 
 
+def pulse(state):
+
+    pulse_up = osc.linear(0, 13, 2, state.t)
+    if state.v == pulse_up:
+        return (1,0,0,0)
+
+    return (0,0,0,0)
+
+
+    pulse_base = 1.0 - fn.impulse(8,
+                                  fn.linear_window_duration(
+                                    0, 1, state.t % 3.0))
+
+
+    pulse_up = fn.impulse(8, fn.linear_window(pulse_base * state.v_res - 1,
+                                               pulse_base * state.v_res + 8,
+                                               state.v))
+
+    return (pulse_up, 0,0,0)
+
+
 def gauge_pulse(state):
 
     base = 0.2 * gen.waber(1, 0, state)
@@ -156,3 +177,29 @@ def random_color_glow(state):
 
 
 
+def krrr(state):
+    randomize = [(0, 1, 2), (1, 2, 3), (2,3,4), (3,5,6), (4,5,6), (5,6,7),
+                 (6,7,8),
+                 (7,8,9), (8,9,10), (9,10,11), (10,11,12), (11,12,13),
+                 (12,),
+                 (11,12,), (10,11,12), (9,10,11), (8,9,10,), (7,8,9,),
+                 (6,7,8,), (5,6,7,),
+                 (4,5,6,), (3,4,5,), (2,3,4,), (1,2,3,), (1,2,0), (1,0),
+                 (0,)]
+
+
+    duration = 0.07
+
+
+    total_win_size = len(randomize) * duration
+
+    select = math.floor((state.t % total_win_size) / duration)
+    selected = randomize[select]
+
+    pulse_t = fn.mix(0, 1, state.t % duration)
+
+    if state.v in selected:
+        pulse = fn.impulse(12, pulse_t)
+        return (1, 0, 0,0)
+
+    return (0,0,0,0)
