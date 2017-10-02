@@ -130,7 +130,7 @@ def random_glow(state):
                  (0, 2, 5, 8, 12), (0, 4), (9, 12), (1, 3, 6),
                  (0, 4, 7), (9, 3, 12), (0, 5, 12)]
 
-    duration = 0.8
+    duration = 1
 
     glow_fn = fn.impulse
 
