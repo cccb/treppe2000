@@ -66,24 +66,6 @@ def color_flow(state):
 
 
 
-def pulse(state):
-
-    pulse_base = 1.0 - fn.impulse(8,
-                                  fn.linear_window_duration(
-                                    4, 1, state.t % 20.0))
-
-
-    pulse_up = fn.impulse(8, fn.linear_window(pulse_base * state.v_res - 1,
-                                               pulse_base * state.v_res + 8,
-                                               state.v))
-
-    return (pulse_up, 0,0,0)
-
-
-
-
-
-
 def gauge_pulse(state):
 
     base = 0.2 * gen.waber(1, 0, state)
