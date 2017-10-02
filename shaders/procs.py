@@ -86,9 +86,8 @@ def gauge_pulse(state):
     return (0, 0.4 * gauge,  0.2 * gauge + base, base2)
 
 
-
 def flow_pulse(state):
-    pulse_len = 5.5
+    pulse_len = 4.5
 
     blue_base = 0.2 * gen.waber(1, 0, state)
 
@@ -122,4 +121,38 @@ def pulse_wob(state):
                                                state.v))
 
     return (0, 0, blue_base, pulse_up * 0.7)
+
+
+def random_glow(state):
+    randomize = [(9, 2, 4, 8), (0, 2, 5), (3, 10, 12), (0, 3, 5, 12),
+                 (4, 9), (2, 9, 11), (4, 8), (1, 5, 10, 12, 7),
+                 (1,), (3, 8, 12), (9,), (2, 10, 0), (4, 11, 5, 7),
+                 (0, 2, 5, 8, 12), (0, 4), (9, 12), (1, 3, 6),
+                 (0, 4, 7), (9, 3, 12), (0, 5, 12)]
+
+    duration = 0.8
+
+    glow_fn = fn.impulse
+
+    total_win_size = len(randomize) * duration
+
+    select = math.floor((state.t % total_win_size) / duration)
+    selected = randomize[select]
+
+    pulse_t = fn.mix(0, 1, state.t % duration)
+
+    if state.v in selected:
+        pulse = fn.impulse(12, pulse_t)
+        return (0, 0, 0, pulse)
+
+    return (0,0,0,0)
+
+
+def random_color_glow(state):
+    colors = smooth_colors(state)
+    glows = random_glow(state)
+
+    return (0.5 * colors[0], 0.5 * colors[1], 0.5* colors[2], glows[3])
+
+
 
