@@ -203,3 +203,21 @@ def krrr(state):
         return (1, 0, 0,0)
 
     return (0,0,0,0)
+
+
+def palette_test(state):
+    p1 = [(0.5,0.5,0.5,0.0),
+          (0.5,0.5,0.5,0.0),
+          (2.0,1.0,0.0,0.0),
+          (0.5,0.20,0.25,0.0)]
+
+    p2 = [(0.5,0.5,0.5,0.0),
+          (0.5,0.5,0.5,0.0),
+          (1.0,1.0,1.0,0.0),
+          (0.0,0.10,0.20, 0.0)]
+
+    win = fn.linear_window(0, state.v_res, state.v)
+
+    return fn.palette(*p2, win - state.t)
+
+

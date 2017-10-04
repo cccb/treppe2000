@@ -226,3 +226,17 @@ def interpolate_cosine(y0, y1, x):
     """
     x2 = 0.5 * (1.0 - math.cos(x * math.pi))
     return y0 * (1 - x2) + y1 * x2
+
+
+def palette(a, b, c, d, t):
+    """
+    Generate a palette based on
+    http://www.iquilezles.org/www/articles/palettes/palettes.htm
+
+    a b c d are vec4
+    t is float
+    """
+    return (a[0] + b[0] * math.cos(6.28318 * (c[0] * t + d[0])),
+            a[1] + b[1] * math.cos(6.28318 * (c[1] * t + d[1])),
+            a[2] + b[2] * math.cos(6.28318 * (c[2] * t + d[2])),
+            a[3] + b[3] * math.cos(6.28318 * (c[3] * t + d[3])))
