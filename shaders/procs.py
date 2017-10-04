@@ -216,8 +216,23 @@ def palette_test(state):
           (1.0,1.0,1.0,0.0),
           (0.0,0.10,0.20, 0.0)]
 
+    p3 = [(0.5,0.5,0.5,0.0),
+          (0.5,0.5,0.5,0.0),
+          (1.0,1.0,1.0,0.0),
+          (0.3,0.20,0.20,0.0)]
+
     win = fn.linear_window(0, state.v_res, state.v)
 
-    return fn.palette(*p2, win - state.t)
+    t_win = state.t % 30
+    if t_win < 10:
+        return fn.palette(*p1, win - state.t)
+
+    if t_win < 20:
+        return fn.palette(*p2, win - state.t)
+
+    if t_win < 30:
+        return fn.palette(*p3, win - state.t)
+
+
 
 
