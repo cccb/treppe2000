@@ -106,11 +106,13 @@ def main(args):
         pygame.display.update()
 
         # Update synth
-        if i % (0.5 * FPS) == 0:
+        if i % (0.025 * FPS) == 0:
             # Every ~1.5 seconds do:
-            key = random.randint(0, CHANNELS_ACTIVE - 1)
-            SYNTH.hit(key)
-            print("BAM:", key)
+            key_on = random.randint(0, CHANNELS_ACTIVE - 1)
+            key_off = random.randint(0, CHANNELS_ACTIVE - 1)
+
+            SYNTH.on(key_on, 1.0)
+            SYNTH.off(key_off)
 
 
         # Update state

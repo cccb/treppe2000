@@ -67,7 +67,13 @@ def synth_adsr(a, d, s, r, t_on, t_off, v, t):
     Release: Time until zero level is reached
     """
 
+    if t_on <= 0.0:
+        return 0.0
+
     # Release
+    if t_off > t_on and t > t_off + r:
+        return 0.0
+
     if t >= t_off and t_off > t_on:
         release_win = fn.linear_window_duration(t_off, r, t)
         release = fn.interpolate_cosine(s, 0.0, release_win)
@@ -88,5 +94,11 @@ def synth_adsr(a, d, s, r, t_on, t_off, v, t):
 
         return decay
 
-    return s
+    if t >= t_on:
+        return s
+
+    if t_off > t_on and t >= t_off:
+        return 0.0
+
+    return 0.0
 

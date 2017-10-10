@@ -176,6 +176,23 @@ def random_color_glow(state):
     return (0.5 * colors[0], 0.5 * colors[1], 0.5* colors[2], glows[3])
 
 
+
+def synth_glow(state):
+    synth = state.synth
+    t_on = synth.t_on[state.v]
+    t_off = synth.t_off[state.v]
+    v = synth.v[state.v]
+
+    envelope = gen.synth_adsr(synth.a,
+                              synth.d,
+                              synth.s,
+                              synth.r,
+                              t_on, t_off, v,
+                              state.t)
+
+    return (0, 0, 0, envelope)
+
+
 def synth_color_glow(state):
 
     colors = smooth_colors(state)
