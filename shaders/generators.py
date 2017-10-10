@@ -57,3 +57,36 @@ def gauge(perc, state):
 
     return 0.0
 
+
+def synth_adsr(a, d, s, r, t_on, t_off, v, t):
+    """
+    Generate envelope from synth state based on
+    Attack: Time until max value
+    Decay: Time until sustain is reached
+    Sustain: Sustain level
+    Release: Time until zero level is reached
+    """
+
+    # Release
+    if t >= t_off and t_off > t_on:
+        release_win = fn.linear_window_duration(t_off, r, t)
+        release = fn.interpolate_cosine(s, 0.0, release_win)
+
+        return release
+
+    # Attack
+    if t >= t_on and t < t_on + a:
+        attack_win = fn.linear_window_duration(t_on, a, t)
+        attack = fn.interpolate_cosine(0.0, v, attack_win)
+
+        return attack
+
+    # Decay
+    if t >= t_on + a and t < t_on + a + d:
+        decay_win = fn.linear_window_duration(t_on + a, d, t)
+        decay = fn.interpolate_cosine(v, s, decay_win)
+
+        return decay
+
+    return s
+
