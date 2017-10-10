@@ -5,16 +5,21 @@ import time
 import math
 import argparse
 import inspect
+import random
 
 import pygame
 
 from shaders import procs, state
 
+CHANNELS_AVAILABLE = 16
 CHANNELS_ACTIVE = 13
 
 WIDTH = 300
 HEIGHT = 800
 
+SYNTH = state.SynthState(CHANNELS_ACTIVE)
+
+FPS = 60
 
 def get_shaders():
     return {name: proc
@@ -64,7 +69,8 @@ def render(ctx, t, proc):
                               u=0,
                               v=i,
                               h_res=1,
-                              v_res=CHANNELS_ACTIVE)
+                              v_res=CHANNELS_ACTIVE,
+                              synth=SYNTH)
 
         # draw strip
         rgbw = proc(s)
@@ -86,6 +92,7 @@ def main(args):
     display = pygame.display.set_mode((300, 800), 0, 32)
 
     t0 = time.time()
+    i = 0
 
     while 42:
         # check for quit events
@@ -98,6 +105,18 @@ def main(args):
         render(display, t, shader)
         pygame.display.update()
 
+        # Update synth
+        if i % (0.5 * FPS) == 0:
+            # Every ~1.5 seconds do:
+            key = random.randint(0, CHANNELS_ACTIVE - 1)
+            SYNTH.hit(key)
+            print("BAM:", key)
+
+
+        # Update state
+        i += 1
+
+        time.sleep(1.0/FPS)
 
 if __name__ == "__main__":
     args = parse_args()

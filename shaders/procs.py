@@ -176,6 +176,14 @@ def random_color_glow(state):
     return (0.5 * colors[0], 0.5 * colors[1], 0.5* colors[2], glows[3])
 
 
+def synth_color_glow(state):
+
+    colors = smooth_colors(state)
+    glows = synth_glow(state)
+
+    return (0.5 * colors[0], 0.5 * colors[1], 0.5* colors[2], glows[3])
+
+
 
 def krrr(state):
     randomize = [(0, 1, 2), (1, 2, 3), (2,3,4), (3,5,6), (4,5,6), (5,6,7),
