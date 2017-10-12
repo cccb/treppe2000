@@ -57,8 +57,8 @@ def _encode_rgbw16(rgbw):
 
 def _write_frame(conn, frame):
 
-    for channel in CHANNEL_MAPPING:
-        rgbw = frame[channel]
+    for i, rgbw in enumerate(frame):
+        channel = CHANNEL_MAPPING[i]
         update = bytes([0x23, channel]) + _encode_rgbw16(rgbw)
         conn.write(update)
         time.sleep(20e-6)
