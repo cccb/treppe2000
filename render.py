@@ -12,12 +12,15 @@ import binascii
 
 from shaders import procs, state
 from treppe import protocol
+from prtcl import space
+from prtcl import programs as prtcl_programs
 
 
 CHANNELS_ACTIVE = 13
 
 SYNTH = state.SynthState(CHANNELS_ACTIVE)
 
+SPACE = space.Space(fps=60)
 
 def open_socket(host="localhost", port=2334):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -57,6 +60,8 @@ def render_loop(conn, shader, fps):
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+    prtcl_samples = set()
+
     while True:
         t = time.time() - t0
         # Make shader state
@@ -68,6 +73,21 @@ def render_loop(conn, shader, fps):
                                   h_res=1,
                                   v_res=CHANNELS_ACTIVE,
                                   synth=SYNTH)
+
+            # Simulate particles
+            prtcl_programs.random_push(SPACE)
+
+
+            # Use particles as synth input
+            p_on = set(SPACE.sample1d()) - prtcl_samples
+            p_off = prtcl_samples - p_on
+            prtcl_samples = p_on
+
+            for p in p_on:
+                SYNTH.on(12 - p)
+
+            for p in p_off:
+                SYNTH.off(12 - p)
 
             # Draw strip
             frame.append(shader(s))

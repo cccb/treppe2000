@@ -3,10 +3,13 @@ import time
 
 class Space:
 
-    def __init__(self, g):
+    def __init__(self, g=9.81, fps=30):
         """Initialize world"""
         self.g = -g
         self.particles = set()
+
+        self.i = 0
+        self.fps = fps
 
         self.t = None
 
@@ -38,6 +41,7 @@ class Space:
             p.update(dt)
 
         self.t = time.time()
+        self.i += 1
 
 
     def clear(self):
@@ -56,4 +60,8 @@ class Space:
 
         print("-----------------------------------------------")
 
+
+    def sample1d(self):
+        """Get particles mapped to discrete stairs"""
+        return (round(p.y) for p in self.particles if p.y >= 0.0)
 
