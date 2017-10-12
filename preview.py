@@ -94,7 +94,7 @@ def main(args):
                 packet.payload[:8])
         elif packet.cmd == protocol.CMD_FRAME:
             framebuffer = packet.payload
-        elif packet.CMD == protocol.CMD_INVALID:
+        elif packet.cmd == protocol.CMD_INVALID:
             print("ERROR: Received invalid data.")
 
         render(display, framebuffer)
