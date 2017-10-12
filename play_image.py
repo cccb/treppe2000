@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 """
 Play a png file line by line
@@ -5,11 +6,21 @@ Play a png file line by line
 
 import time
 import socket
+import argparse
 
 from PIL import Image
 
 from treppe import protocol
 
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-H", "--host", default="localhost")
+    parser.add_argument("-p", "--port", type=int, default=3123)
+    parser.add_argument("-f", "--fps", type=int, default=30)
+    parser.add_argument("filename", nargs=1)
+
+    return parser.parse_args()
 
 
 def _decode_rgba(rgba):
@@ -42,5 +53,14 @@ def play_image(conn, filename, fps):
             time.sleep(1.0 / fps)
 
 
+
+def main(args):
+    conn = (args.host, args.port)
+    play_image(conn, args.filename[0], args.fps)
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(args)
 
 
