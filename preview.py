@@ -6,36 +6,30 @@ import math
 import argparse
 import inspect
 import random
+import socket
 
 import pygame
 
-from shaders import procs, state
+from treppe import protocol
 
-CHANNELS_AVAILABLE = 16
-CHANNELS_ACTIVE = 13
+DEFAULT_PORT = 3123
 
 WIDTH = 300
 HEIGHT = 800
 
-SYNTH = state.SynthState(CHANNELS_ACTIVE)
-
-FPS = 60
-
-def get_shaders():
-    return {name: proc
-            for name, proc in inspect.getmembers(procs, inspect.isfunction)
-            if not name.startswith("_")}
+CHANNELS_ACTIVE = 13
 
 
-def list_shaders(shaders_available):
-    print("Shaders available:")
-    for name, _ in shaders_available.items():
-        print("    {}".format(name))
+def open_socket(host="localhost", port=2334):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind((host, int(port)))
+
+    return sock
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--shader")
+    parser.add_argument("-p", "--port", default=DEFAULT_PORT)
 
     return parser.parse_args()
 
@@ -50,7 +44,7 @@ def draw_strip(ctx, i, color):
     pygame.draw.rect(ctx, color, rect_dn)
 
 
-def _encode_rgbw(rgbw, bits):
+def _map_rgbw(rgbw):
     rgb = (min(rgbw[0] + rgbw[3], 1.0),
            min(rgbw[1] + rgbw[3], 1.0),
            min(rgbw[2] + rgbw[3], 1.0))
@@ -60,39 +54,31 @@ def _encode_rgbw(rgbw, bits):
             round(rgb[2] * 255.0))
 
 
-
-def render(ctx, t, proc):
+def render(ctx, frame):
 
     for i in range(0, CHANNELS_ACTIVE):
-        # Make shader state
-        s = state.ShaderState(t=t,
-                              u=0,
-                              v=i,
-                              h_res=1,
-                              v_res=CHANNELS_ACTIVE,
-                              synth=SYNTH)
+        color = _map_rgbw(frame[i])
 
-        # draw strip
-        rgbw = proc(s)
-
-        color = _encode_rgbw(rgbw, 8)
         draw_strip(ctx, i, color)
 
 
 def main(args):
-    shaders_available = get_shaders()
-    shader = shaders_available.get(args.shader)
-
-    if not shader:
-        list_shaders(shaders_available)
-        return
 
     pygame.init()
+    sock = open_socket(port=args.port)
+
+    print("Listening on 0.0.0.0:{}".format(args.port))
 
     display = pygame.display.set_mode((300, 800), 0, 32)
 
     t0 = time.time()
     i = 0
+
+    framebuffer = [(0, 0, 0, 0)
+                   for _ in range(0, protocol.CHANNELS_AVAILABLE)]
+
+    render(display, framebuffer)
+    pygame.display.update()
 
     while 42:
         # check for quit events
@@ -100,25 +86,20 @@ def main(args):
             if event.type == pygame.QUIT:
                 pygame.quit(); sys.exit();
 
-        t = time.time() - t0
-        display.fill((0,0,0))
-        render(display, t, shader)
+
+        # Read from socket
+        packet = protocol.receive(sock)
+        if packet.cmd == protocol.CMD_SET_DIRECT:
+            framebuffer[packet.flags] = protocol.decode_rgbw16(
+                packet.payload[:8])
+        elif packet.cmd == protocol.CMD_FRAME:
+            framebuffer = packet.payload
+        elif packet.CMD == protocol.CMD_INVALID:
+            print("ERROR: Received invalid data.")
+
+        render(display, framebuffer)
         pygame.display.update()
 
-        # Update synth
-        if i % (0.025 * FPS) == 0:
-            # Every ~1.5 seconds do:
-            key_on = random.randint(0, CHANNELS_ACTIVE - 1)
-            key_off = random.randint(0, CHANNELS_ACTIVE - 1)
-
-            SYNTH.on(key_on, 1.0)
-            SYNTH.off(key_off)
-
-
-        # Update state
-        i += 1
-
-        time.sleep(1.0/FPS)
 
 if __name__ == "__main__":
     args = parse_args()
