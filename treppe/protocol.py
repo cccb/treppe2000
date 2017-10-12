@@ -166,5 +166,44 @@ def decode_frame_rgbw16(data):
     return [decode_rgbw16(data[i:i+8]) for i in range(0, len(data), 8)]
 
 
+def _pad_frame_rgb(frame):
+    if len(frame) < CHANNELS_AVAILABLE:
+        frame = frame + [(0, 0, 0)
+                         for _ in range(0, CHANNELS_AVAILABLE - len(frame))]
+    return frame
 
+
+def _pad_frame_rgbw(frame):
+    if len(frame) < CHANNELS_AVAILABLE:
+        frame = frame + [(0, 0, 0, 0)
+                         for _ in range(0, CHANNELS_AVAILABLE - len(frame))]
+    return frame
+
+
+def encode_frame_rgb8(frame):
+    frame = _pad_frame_rgb(frame)
+
+    return b"".join(encode_rgb8(*rgb)
+                    for rgb in frame[:CHANNELS_AVAILABLE])
+
+
+def encode_frame_rgbw8(frame):
+    frame = _pad_frame_rgbw(frame)
+
+    return b"".join(encode_rgbw8(*rgbw)
+                    for rgbw in frame[:CHANNELS_AVAILABLE])
+
+
+def encode_frame_rgb16(frame):
+    frame = _pad_frame_rgb(frame)
+
+    return b"".join(encode_rgb16(*rgb)
+                    for rgb in frame[:CHANNELS_AVAILABLE])
+
+
+def encode_frame_rgbw16(frame):
+    frame = _pad_frame_rgbw(frame)
+
+    return b"".join(encode_rgbw16(*rgbw)
+                    for rgbw in frame[:CHANNELS_AVAILABLE])
 
