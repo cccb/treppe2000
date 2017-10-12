@@ -73,7 +73,7 @@ def receive(sock):
     elif cmd == CMD_FRAME:
         try:
             payload = decode_frame(payload_data, flags)
-        except:
+        except Exception as e:
             return DecodeResult(CMD_INVALID, 0x00, None)
 
     return DecodeResult(cmd, flags, payload)
@@ -118,7 +118,7 @@ def decode_rgbw16(payload):
     r = float(int.from_bytes(payload[0:2], "big")) / 65535.0
     g = float(int.from_bytes(payload[2:4], "big")) / 65535.0
     b = float(int.from_bytes(payload[4:6], "big")) / 65535.0
-    a = float(int.from_bytes(payload[6:8], "big")) / 65535.0
+    w = float(int.from_bytes(payload[6:8], "big")) / 65535.0
 
     return (r, g, b, w)
 
@@ -148,9 +148,9 @@ def decode_frame(data, flags):
 
     elif flags & FLAG_RGBA:
         if flags & FLAG_BITS_8:
-            return decode_frame_rgba8(data)
+            return decode_frame_rgbw8(data)
         else:
-            return decode_frame_rgba16(data)
+            return decode_frame_rgbw16(data)
 
 
 def decode_frame_rgb8(data):
@@ -207,3 +207,9 @@ def encode_frame_rgbw16(frame):
     return b"".join(encode_rgbw16(*rgbw)
                     for rgbw in frame[:CHANNELS_AVAILABLE])
 
+
+def cmd_frame_rgbw16(frame):
+    payload = bytes([CMD_FRAME, FLAG_RGBA|FLAG_BITS_16]) + \
+              encode_frame_rgbw16(frame)
+
+    return payload
