@@ -4,6 +4,7 @@
 UDP Server for treppe2000
 """
 
+import time
 import socket
 import argparse
 
@@ -11,7 +12,7 @@ import serial
 
 from treppe import protocol
 
-LISTEN_PORT_DEFAULT = 7331
+LISTEN_PORT_DEFAULT = 3123
 
 SERIAL_PORT_DEFAULT = "/dev/ttyUSB0"
 SERIAL_BAUD_DEFAULT = 1000000
