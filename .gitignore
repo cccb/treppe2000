@@ -6,5 +6,10 @@
 
 render
 
+*.pyc
+
+.cache/
 
 __pycache__/
+
+venv/
