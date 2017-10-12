@@ -15,10 +15,10 @@ from treppe import protocol
 DEFAULT_PORT = 3123
 
 WIDTH = 300
-HEIGHT = 800
 
 CHANNELS_ACTIVE = 13
 
+HEIGHT = CHANNELS_ACTIVE * 50 + 20
 
 def open_socket(host="localhost", port=2334):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -69,7 +69,7 @@ def main(args):
 
     print("Listening on 0.0.0.0:{}".format(args.port))
 
-    display = pygame.display.set_mode((300, 800), 0, 32)
+    display = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 
     t0 = time.time()
     i = 0
@@ -94,7 +94,7 @@ def main(args):
                 packet.payload[:8])
         elif packet.cmd == protocol.CMD_FRAME:
             framebuffer = packet.payload
-        elif packet.CMD == protocol.CMD_INVALID:
+        elif packet.cmd == protocol.CMD_INVALID:
             print("ERROR: Received invalid data.")
 
         render(display, framebuffer)
