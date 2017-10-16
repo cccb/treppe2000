@@ -13,7 +13,7 @@ FLOOR = particle.Particle((0,0), fixed=True)
 
 def random_push(space):
 
-    if space.i % (space.fps / 2) == 0:
+    if len(list(space.sample1d())) == 0:
         space.add_particle(particle.Particle((0, 0),
                                              (0, random.random() * 12.0),
                                               collides=False))

@@ -199,7 +199,7 @@ def prtcls(state):
     t_off = synth.t_off[state.v]
     v = synth.v[state.v]
 
-    envelope = gen.synth_adsr(0.1, 0.1, 1.0, 0,
+    envelope = gen.synth_adsr(0.1, 0.5, 0.7, 1.0,
                               t_on, t_off, v,
                               state.t)
 

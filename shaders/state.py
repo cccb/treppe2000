@@ -50,8 +50,6 @@ class SynthState:
         t_off = self.t_off[mapped_channel]
 
         # Check if channel is already on
-        if t_on < t_off:
-            return
 
         self.t_on[mapped_channel] = t
         self.t_off[mapped_channel] = 0.0
