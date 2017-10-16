@@ -43,7 +43,17 @@ class SynthState:
     def on(self, channel, velocity=1.0):
         """Activate Channel"""
         mapped_channel = self._map_channel(channel)
-        self.t_on[mapped_channel] = time.time() - self.t0
+
+        t = time.time() - self.t0
+
+        t_on = self.t_on[mapped_channel]
+        t_off = self.t_off[mapped_channel]
+
+        # Check if channel is already on
+        if t_on < t_off:
+            return
+
+        self.t_on[mapped_channel] = t
         self.t_off[mapped_channel] = 0.0
         self.v[mapped_channel] = velocity
 

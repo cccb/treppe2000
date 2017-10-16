@@ -96,6 +96,8 @@ def render_loop(conn, shader, fps):
         time.sleep(1.0/fps)
 
 
+
+
 def main(args):
     shaders_available = get_shaders()
     shader = shaders_available.get(args.shader)
