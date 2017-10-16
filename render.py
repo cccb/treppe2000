@@ -84,10 +84,10 @@ def render_loop(conn, shader, fps):
             prtcl_samples = p_on
 
             for p in p_on:
-                SYNTH.on(12 - p)
+                SYNTH.on(13 - p)
 
             for p in p_off:
-                SYNTH.off(12 - p)
+                SYNTH.off(13 - p)
 
             # Draw strip
             frame.append(shader(s))
