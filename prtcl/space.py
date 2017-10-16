@@ -63,5 +63,5 @@ class Space:
 
     def sample1d(self):
         """Get particles mapped to discrete stairs"""
-        return (round(p.y) for p in self.particles if p.y >= 0.0)
+        return (12.0 - round(p.y) for p in self.particles if round(p.y) >= 0.0)
 

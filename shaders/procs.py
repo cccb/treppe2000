@@ -193,6 +193,19 @@ def synth_glow(state):
     return (0, 0, 0, envelope)
 
 
+def prtcls(state):
+    synth = state.synth
+    t_on = synth.t_on[state.v]
+    t_off = synth.t_off[state.v]
+    v = synth.v[state.v]
+
+    envelope = gen.synth_adsr(0.1, 0.1, 1.0, 0,
+                              t_on, t_off, v,
+                              state.t)
+
+    return (0, 0, 0, envelope)
+
+
 def synth_color_glow(state):
 
     colors = smooth_colors(state)

@@ -77,17 +77,16 @@ def render_loop(conn, shader, fps):
             # Simulate particles
             prtcl_programs.random_push(SPACE)
 
-
             # Use particles as synth input
             p_on = set(SPACE.sample1d()) - prtcl_samples
             p_off = prtcl_samples - p_on
             prtcl_samples = p_on
 
             for p in p_on:
-                SYNTH.on(13 - p)
+                SYNTH.on(p)
 
             for p in p_off:
-                SYNTH.off(13 - p)
+                SYNTH.off(p)
 
             # Draw strip
             frame.append(shader(s))
