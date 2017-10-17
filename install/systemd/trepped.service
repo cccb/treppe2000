@@ -5,8 +5,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=alicelg
+User=root
 ExecStart=/opt/ccc/treppe2000/trepped.py
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
