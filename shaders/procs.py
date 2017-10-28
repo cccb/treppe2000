@@ -42,11 +42,10 @@ def smooth_colors(state):
     return (r, g, b, w)
 
 
-
 def color_flow(state):
     dimm = 0.5 # Be kind to our retinas
 
-    pulse_len = 8.5
+    pulse_len = 12.5
 
     # Get base color from palette
     p1 = [(0.5,0.5,0.5,0.0),
@@ -61,7 +60,7 @@ def color_flow(state):
     # flowing pulse
     v_pos = fn.linear_window_duration(1,
                                       pulse_len,
-                                      state.t % (pulse_len * 1.2)) \
+                                      state.t % (pulse_len * 1.1)) \
                 * (state.v_res + 8)
 
     f_pulse = fn.linear_window(-8 + v_pos, 0 + v_pos, state.v)
@@ -70,6 +69,46 @@ def color_flow(state):
     return (base[0] * pulse * dimm,
             base[1] * pulse * dimm,
             base[2] * pulse * dimm,
+            0.04)
+
+
+def color_flow_flow(state):
+    dimm = 0.5 # Be kind to our retinas
+
+    pulse_len = 18.5
+
+    # Get base color from palette
+    p1 = [(0.5,0.5,0.5,0.0),
+          (0.5,0.5,0.5,0.0),
+          (2.0,1.0,0.0,0.0),
+          (0.5,0.20,0.25,0.0)]
+
+    # Cycle through the palette
+    cycle_period = 15 * 60 # 15 minutes
+    base = fn.palette(*p1, osc.saw(cycle_period, state.t))
+
+    # flowing pulse
+    v_pos = fn.linear_window_duration(1,
+                                      pulse_len,
+                                      state.t % (pulse_len * 1.1)) \
+                * (state.v_res + 8)
+
+    f_pulse = fn.linear_window(-8 + v_pos, 0 + v_pos, state.v)
+    pulse = 1.0 - fn.parabola(5.95, f_pulse)
+
+    # flowing pulse up
+    v_pos_up = fn.linear_window_duration(1,
+                                        pulse_len,
+                                        -state.t % (pulse_len * 1.3)) \
+                  * (state.v_res + 8)
+    # v_pos_up = 1.0 - v_pos_up
+
+    f_pulse_up = fn.linear_window(-8 + v_pos_up, 0 + v_pos_up, state.v)
+    pulse_up = 1.0 - fn.parabola(5.95, f_pulse_up)
+
+    return (base[0] * pulse_up * dimm * pulse,
+            base[1] * pulse_up * dimm * pulse,
+            base[2] * pulse_up * dimm * pulse,
             0.04)
 
 
