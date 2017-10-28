@@ -44,25 +44,33 @@ def smooth_colors(state):
 
 
 def color_flow(state):
+    dimm = 0.5 # Be kind to our retinas
 
-    p_r = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.0 * state.t))
-    p_g = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.0 * state.t + 1.0))
-    p_b = (state.v_res - 1) * (0.5 + 0.5 * math.sin(2.0 * state.t + 2.0))
+    pulse_len = 8.5
 
-    r = 0.0
-    g = 0.0
-    b = 0.0
+    # Get base color from palette
+    p1 = [(0.5,0.5,0.5,0.0),
+          (0.5,0.5,0.5,0.0),
+          (2.0,1.0,0.0,0.0),
+          (0.5,0.20,0.25,0.0)]
 
-    if abs(state.v - p_r) < 0.5:
-        r = 1.0
+    # Cycle through the palette
+    cycle_period = 15 * 60 # 15 minutes
+    base = fn.palette(*p1, osc.saw(cycle_period, state.t))
 
-    if abs(state.v - p_g) < 0.5:
-        g = 1.0
+    # flowing pulse
+    v_pos = fn.linear_window_duration(1,
+                                      pulse_len,
+                                      state.t % (pulse_len * 1.2)) \
+                * (state.v_res + 8)
 
-    if abs(state.v - p_b) < 0.5:
-        b = 1.0
+    f_pulse = fn.linear_window(-8 + v_pos, 0 + v_pos, state.v)
+    pulse = 1.0 - fn.parabola(1.95, f_pulse)
 
-    return (r, g, b, 0.1)
+    return (base[0] * pulse * dimm,
+            base[1] * pulse * dimm,
+            base[2] * pulse * dimm,
+            0.04)
 
 
 
