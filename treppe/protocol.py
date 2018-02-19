@@ -183,9 +183,14 @@ def _pad_frame_rgbw(frame):
 def encode_frame_rgb8(frame):
     frame = _pad_frame_rgb(frame)
 
-    return b"".join(encode_rgb8(*rgb)
+    return b"".join(encode_rgb8(*(rgb[:3]))
                     for rgb in frame[:CHANNELS_AVAILABLE])
 
+def encode_frame_crap8(frame):
+    frame = _pad_frame_rgb(frame)
+
+    return b"".join(encode_rgb8(*(rgb[:3]))
+                    for rgb in frame)
 
 def encode_frame_rgbw8(frame):
     frame = _pad_frame_rgbw(frame)

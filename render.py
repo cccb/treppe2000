@@ -16,7 +16,7 @@ from prtcl import space
 from prtcl import programs as prtcl_programs
 
 
-CHANNELS_ACTIVE = 13
+CHANNELS_ACTIVE = 16
 
 SYNTH = state.SynthState(CHANNELS_ACTIVE)
 
@@ -35,6 +35,8 @@ def parse_args():
     parser.add_argument("-H", "--host", default="localhost")
     parser.add_argument("-p", "--port", default=3123)
     parser.add_argument("-f", "--fps", default=60)
+    parser.add_argument("-c", "--crap", default=False, action="store_true")
+    parser.add_argument("-l", "--leds", default=16, type=int)
 
     return parser.parse_args()
 
@@ -51,7 +53,7 @@ def list_shaders(shaders_available):
         print("    {}".format(name))
 
 
-def render_loop(conn, shader, fps):
+def render_loop(conn, crap, leds, shader, fps):
     """
     Rendering loop for a shader
     """
@@ -66,12 +68,12 @@ def render_loop(conn, shader, fps):
         t = time.time() - t0
         # Make shader state
         frame = []
-        for i in range(0, CHANNELS_ACTIVE):
+        for i in range(0, leds):
             s = state.ShaderState(t=t,
                                   u=0,
                                   v=i,
                                   h_res=1,
-                                  v_res=CHANNELS_ACTIVE,
+                                  v_res=leds,
                                   synth=SYNTH)
 
             # Simulate particles
@@ -91,7 +93,11 @@ def render_loop(conn, shader, fps):
             # Draw strip
             frame.append(shader(s))
 
-        sock.sendto(protocol.cmd_frame_rgbw16(frame), conn)
+        if crap:
+            sock.sendto(protocol.encode_frame_crap8(frame), conn)
+        else:
+            sock.sendto(protocol.cmd_frame_rgbw16(frame), conn)
+
         time.sleep(1.0/fps)
 
 
@@ -105,7 +111,11 @@ def main(args):
         return
 
     print("Sending data to {}:{}".format(args.host, args.port))
-    render_loop((args.host, int(args.port)), shader, args.fps)
+    render_loop((args.host, int(args.port)),
+                args.crap,
+                args.leds,
+                shader,
+                args.fps)
 
 
 if __name__ == "__main__":
