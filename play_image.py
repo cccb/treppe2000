@@ -16,8 +16,10 @@ from treppe import protocol
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-H", "--host", default="localhost")
+    parser.add_argument("-c", "--crap", default=False, action="store_true")
     parser.add_argument("-p", "--port", type=int, default=3123)
     parser.add_argument("-f", "--fps", type=int, default=30)
+    parser.add_argument("-l", "--leds", type=int, default=16)
     parser.add_argument("filename", nargs=1)
 
     return parser.parse_args()
@@ -41,14 +43,17 @@ def _get_col(image, row, max_width):
     return data
 
 
-def play_image(conn, filename, fps):
+def play_image(conn, filename, fps, crap, leds):
     image = Image.open(filename)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     while True:
         for x in range(image.width):
-            frame = _get_col(image, x, 13)
-            sock.sendto(protocol.cmd_frame_rgbw16(frame), conn)
+            frame = _get_col(image, x, leds)
+            if crap:
+                sock.sendto(protocol.encode_frame_crap8(frame), conn)
+            else:
+                sock.sendto(protocol.cmd_frame_rgbw16(frame), conn)
 
             time.sleep(1.0 / fps)
 
@@ -56,7 +61,11 @@ def play_image(conn, filename, fps):
 
 def main(args):
     conn = (args.host, args.port)
-    play_image(conn, args.filename[0], args.fps)
+    play_image(conn,
+               args.filename[0],
+               args.fps,
+               args.crap,
+               args.leds)
 
 
 if __name__ == "__main__":
