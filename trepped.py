@@ -11,6 +11,7 @@ import argparse
 import serial
 
 from treppe import protocol
+from treppe import olsndots
 
 LISTEN_PORT_DEFAULT = 3123
 
@@ -56,24 +57,35 @@ def _encode_rgbw16(rgbw):
            round(rgbw[3] * 65535.0).to_bytes(2, "little")
 
 
-def _write_frame(conn, frame):
+def _write_frame(boards, frame):
 
-    for i, rgbw in enumerate(frame):
-        channel = CHANNEL_MAPPING[i]
-        update = bytes([0x23, channel]) + _encode_rgbw16(rgbw)
-        conn.write(update)
+    num_boards = len(boards)
+    frame_size = len(frame)
+    sub_frame_size = frame_size / num_boards
+
+    mapped_frame = [frame[channel] for channel in CHANNEL_MAPPING]
+
+    sub_frames = [mapped_frame[i:i + sub_frame_size]
+                  for i in range(0, frame_size, sub_frame_size)]
+
+    for i, board in enumerate(boards):
+        sub_frame = sub_frames[i]
+        board.send_framebuffer(b''.join(_encode_rgbw16(rgbw)
+                                        for rgbw in sub_frame))
+
         time.sleep(20e-6)
 
 
-def recv_loop(conn, sock):
+def recv_loop(boards, sock):
 
     while 42:
         packet = protocol.receive(sock)
 
         if packet.cmd == protocol.CMD_SET_DIRECT:
-            conn.write(b"\x23" + packet.flags + packet.payload)
+            print("This command is currently not supported")
+            pass
         elif packet.cmd == protocol.CMD_FRAME:
-            _write_frame(conn, packet.payload)
+            _write_frame(boards, packet.payload)
 
         time.sleep(20e-6)
 
@@ -81,8 +93,14 @@ def recv_loop(conn, sock):
 def main(args):
     sock = _open_socket(args.listen_port)
 
-    conn = serial.Serial(args.serial_port, args.baudrate)
-    recv_loop(conn, sock)
+    boards = [
+        olsndots.Olsndot(0x23420001),
+        olsndots.Olsndot(0x23420002),
+    ]
+
+    driver = olsndots.Driver(args.serial_port, devices=boards)
+
+    recv_loop(boards, sock)
 
 
 if __name__ == "__main__":
