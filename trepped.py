@@ -56,6 +56,15 @@ def _encode_rgbw16(rgbw):
            round(rgbw[2] * 65535.0).to_bytes(2, "little") + \
            round(rgbw[3] * 65535.0).to_bytes(2, "little")
 
+def _encode_frame(frame_data):
+    """
+    Frame data: [(r,g,b,w), ...]
+
+    The driver (maybe) expects a flat layout of rgbw data (0..65535)
+    Let's try this.
+    """
+    return [v*65535.0 for pixel in frame for v in pixel]
+
 
 def _write_frame(boards, frame):
 
@@ -70,8 +79,7 @@ def _write_frame(boards, frame):
 
     for i, board in enumerate(boards):
         sub_frame = sub_frames[i]
-        board.send_framebuffer(b''.join(_encode_rgbw16(rgbw)
-                                        for rgbw in sub_frame))
+        board.send_framebuffer(_encode_frame(sub_frame))
 
         time.sleep(20e-6)
 
