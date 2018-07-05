@@ -51,6 +51,7 @@ class Driver:
     def recv_struct(self, fmt, timeout=None):
         self._ser.timeout = self.timeout if timeout is None else timeout
         data = self._ser.read_until(b'\0')
+        print("data:" + str(data))
         return struct.unpack('<'+fmt, cobs.decode(data[:-1]))
 
     def send_struct(self, fmt, *args):
@@ -99,6 +100,7 @@ class Olsndot:
 
     Status = namedtuple('Status',
             ['uptime_s', 'uart_overruns', 'frame_overruns', 'invalid_frames', 'vcc_mv', 'temp_celsius'])
+
     def fetch_status(self):
         self.send_cmd(Olsndot.CMD_READ_STATUS)
         (self.fw_ver, self.hw_ver,

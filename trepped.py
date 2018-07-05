@@ -63,14 +63,14 @@ def _encode_frame(frame_data):
     The driver (maybe) expects a flat layout of rgbw data (0..65535)
     Let's try this.
     """
-    return [v*65535.0 for pixel in frame for v in pixel]
+    return [int(v*65535.0) for pixel in frame_data for v in pixel]
 
 
 def _write_frame(boards, frame):
 
     num_boards = len(boards)
     frame_size = len(frame)
-    sub_frame_size = frame_size / num_boards
+    sub_frame_size = int(frame_size / num_boards)
 
     mapped_frame = [frame[channel] for channel in CHANNEL_MAPPING]
 
@@ -79,7 +79,7 @@ def _write_frame(boards, frame):
 
     for i, board in enumerate(boards):
         sub_frame = sub_frames[i]
-        board.send_framebuffer(_encode_frame(sub_frame))
+        board.send_framebuf(_encode_frame(sub_frame))
 
         time.sleep(20e-6)
 

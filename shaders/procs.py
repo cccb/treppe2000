@@ -26,9 +26,12 @@ def const_step(state):
 
 
 def const_colors(state):
-    c = [(0,0,0,0), (0,0,0,0), (0,0,0,0), (0,0,0,0)]
+    c = [(0.0,0,0,0), (0.0,0.0,0,0), (0.0,0.3,0.0,0), (0.0,0.0,0,0.0),
+         (0.0,0,0,0), (0.0,0.0,0,0), (0.0,0,0.0,0), (0.0,0,0,0.0),
+         (0.0,0,0,0), (0.0,0.0,0,0), (0.0,0,0.0,0), (0,0,0,0.0),
+         (0.0,0,0,0), (0.0,0.0,0,0), (0.0,0,0.0,0), (0,0,0,0.0)]
 
-    return c[state.v % 4]
+    return c[state.v % 16]
 
 
 def smooth_colors(state):
@@ -39,7 +42,7 @@ def smooth_colors(state):
     b = 0.5 + 0.5 * math.cos(2.0 * state.t + 4 + offset)
     w = 0.1
 
-    return (r, g, b, w)
+    return (0, r, g, b)
 
 
 def color_flow(state):
