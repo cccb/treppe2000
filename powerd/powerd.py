@@ -6,11 +6,15 @@ from argparse import ArgumentParser
 from llama import mqtt
 
 
-POWER_STATE_CHANGED = "power_state_changed"
-POWER_ON = "power_on"
-POWER_OFF = "power_off"
+POWER_STATE_CHANGED = "@treppe.power/POWER_STATE_CHANGED"
+POWER_STATE = "@treppe.power/POWER_STATE"
+POWER_ON = "@treppe.power/POWER_ON"
+POWER_OFF = "@treppe.power/POWER_OFF"
 
-_state = 0
+def gpio_setup(gpio):
+    """Enable pin as output"""
+    subprocess.run([gpio, "mode", "29", "out"])
+
 
 def get_power_state(gpio):
     """Read GPIO pin, get power state"""
@@ -39,6 +43,15 @@ def power_off(gpio):
         return 0
 
 
+def power_state_changed(state):
+    return {
+        "type": POWER_STATE_CHANGED,
+        "payload": {
+            "state": state,
+        }
+    }
+
+
 def parse_args():
     """Parse commandline arguments"""
     parser = ArgumentParser()
@@ -55,19 +68,31 @@ def parse_args():
     return parser.parse_args()
 
 
-def handle(dispatch, actions):
+def handle(gpio, dispatch, actions):
     """React to incoming actions"""
+    state = get_power_state(gpio)
+
     for action in actions:
-        print(action)
+        if action["type"] == POWER_ON:
+            print("Setting power state: ON")
+            dispatch(power_state_changed(power_on(gpio)))
+        elif action["type"] == POWER_OFF:
+            print("Setting power state: OFF")
+            dispatch(power_state_changed(power_off(gpio)))
+        elif action["type"] == POWER_STATE:
+            print("Getting power state.")
+            dispatch(power_state_changed(get_power_state(gpio)))
 
 
 def main(args):
+    gpio_setup(args.gpio)
+
     # Connect to MQTT broker and start dispatch loop
     dispatch, receive = mqtt.connect(args.broker, {
         "treppe.power": args.topic,
-        })
+    })
 
-    handle(dispatch, receive())
+    handle(args.gpio, dispatch, receive())
 
 if __name__ == "__main__":
     args = parse_args()
