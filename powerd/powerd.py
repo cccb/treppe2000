@@ -27,20 +27,14 @@ def get_power_state(gpio):
 
 def power_on(gpio):
     """Set GPIO pin, get power state"""
-    result = subprocess.check_output([gpio, "write", "29", "1"])
-    try:
-        return int(result.strip())
-    except:
-        return 0
+    subprocess.check_output([gpio, "write", "29", "1"])
+    return 1
 
 
 def power_off(gpio):
     """Set GPIO pin, return next power state"""
-    result = subprocess.check_output([gpio, "write", "29", "0"])
-    try:
-        return int(result.strip())
-    except:
-        return 0
+    subprocess.check_output([gpio, "write", "29", "0"])
+    return 0
 
 
 def power_state_changed(state):
