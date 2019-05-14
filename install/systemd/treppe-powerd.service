@@ -1,0 +1,15 @@
+[Unit]
+Description=Treppe2000 MQTT POWER
+Wants=network.target
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/opt/ccc/treppe2000/powerd/powerd.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+
