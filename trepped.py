@@ -36,7 +36,7 @@ def _open_socket(port):
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind(("0.0.0.0", port))
-
+    s.setblocking(False)
     return s
 
 
@@ -45,6 +45,7 @@ def _parse_args():
     parser.add_argument("-l", "--listen-port", default=LISTEN_PORT_DEFAULT)
     parser.add_argument("-p", "--serial-port", default=SERIAL_PORT_DEFAULT)
     parser.add_argument("-b", "--baudrate", default=SERIAL_BAUD_DEFAULT)
+    parser.add_argument("-t", "--gracetime", default=1.5, type=int)
 
     return parser.parse_args()
 
@@ -89,10 +90,9 @@ def _write_frame(boards, frame):
         time.sleep(20e-6)
 
 
-def recv_loop(boards, sock):
-
-    while 42:
-        packet = protocol.receive(sock)
+def recv_loop(boards, source):
+    for data in source:
+        packet = protocol.decode_packet(source)
 
         if packet.cmd == protocol.CMD_SET_DIRECT:
             print("This command is currently not supported")
@@ -104,7 +104,12 @@ def recv_loop(boards, sock):
 
 
 def main(args):
-    sock = _open_socket(args.listen_port)
+    print("Listening on 0.0.0.0:{}".format(args.listen_port))
+    print("Listening on 0.0.0.0:{} (priority)".format(args.listen_port+1))
+    print("Gracetime: {} s".format(args.gracetime))
+
+    sock_a = _open_socket(args.listen_port)
+    sock_b = _open_socket(args.listen_port+1)
 
     boards = [
         olsndots.Olsndot(0x23420001),
@@ -113,7 +118,11 @@ def main(args):
 
     driver = olsndots.Driver(args.serial_port, devices=boards)
 
-    recv_loop(boards, sock)
+    source = protocol.demultiplex_sockets(
+        protocol.receive_sockets(sock_a, sock_b),
+        args.gracetime)
+
+    recv_loop(boards, source)
 
 
 if __name__ == "__main__":
