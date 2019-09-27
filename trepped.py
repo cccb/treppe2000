@@ -78,7 +78,7 @@ def _write_frame(boards, frame):
     frame_size = len(frame)
     sub_frame_size = int(frame_size / num_boards)
 
-    if len(frame) < len(CHANNEL_MAPPING):
+    if len(frame) < max(CHANNEL_MAPPING) + 1:
         return # invalid data
 
     mapped_frame = [frame[channel] for channel in CHANNEL_MAPPING]
