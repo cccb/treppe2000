@@ -73,6 +73,8 @@ def _encode_frame(frame_data):
 
 
 def _write_frame(boards, frame):
+    # FIXME: This kind of sucks.
+    frame = frame[:max(CHANNEL_MAPPING) + 1]
 
     num_boards = len(boards)
     frame_size = len(frame)
