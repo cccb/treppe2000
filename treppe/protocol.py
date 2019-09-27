@@ -29,6 +29,7 @@ Frame:
 
 import collections
 import time
+import select
 
 CHANNELS_AVAILABLE = 16
 
@@ -50,7 +51,41 @@ DecodeResult = collections.namedtuple("DecodeResult", [
                                       "payload"])
 
 
-def receive(sock):
+def receive_sockets(sock_a, sock_b):
+    """
+    Receive from both sockets.
+    """
+    while 42:
+        sockets, _, _ = select.select([sock_a, sock_b], [], [])
+        packet = None
+        for sock in sockets:
+            data = sock.recv(2048)
+            if sock == sock_a:
+                yield ('a', data)
+            else:
+                yield ('b', data)
+
+
+def demultiplex_sockets(reader, gracetime):
+    """
+    Demultiplex sockets.
+
+    Socket b has priority over a, so when data is
+    received on b, any data from a is discarded for a grace period
+    to prevent oversplill.
+    """
+    t_b = 0
+    for source, packet in reader:
+        t = time.time()
+        if source == 'b':
+            t_b = t
+            yield packet
+            continue
+        if t_b + gracetime < t:
+            yield packet
+
+
+def decode_packet(data):
     """
     Read and decode packet from socket.
 
@@ -60,8 +95,6 @@ def receive(sock):
     :returns: The decoded command
     :rtype: DecodeResult
     """
-    data = sock.recv(2048)
-
     cmd = data[0]
     flags = data[1]
     payload_data = data[2:]

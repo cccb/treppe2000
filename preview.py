@@ -7,6 +7,7 @@ import argparse
 import inspect
 import random
 import socket
+import selectors
 
 import pygame
 
@@ -23,7 +24,7 @@ HEIGHT = CHANNELS_ACTIVE * 50 + 20
 def open_socket(host="localhost", port=2334):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((host, int(port)))
-
+    sock.setblocking(False)
     return sock
 
 
@@ -65,9 +66,11 @@ def render(ctx, frame):
 def main(args):
 
     pygame.init()
-    sock = open_socket(port=args.port)
+    sock_a = open_socket(port=args.port)
+    sock_b = open_socket(port=args.port+1)
 
     print("Listening on 0.0.0.0:{}".format(args.port))
+    print("Listening on 0.0.0.0:{} (priority)".format(args.port+1))
 
     display = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 
@@ -80,7 +83,11 @@ def main(args):
     render(display, framebuffer)
     pygame.display.update()
 
-    while 42:
+    source = protocol.demultiplex_sockets(
+        protocol.receive_sockets(sock_a, sock_b),
+        1.5)
+
+    for data in source:
         # check for quit events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -88,7 +95,7 @@ def main(args):
 
 
         # Read from socket
-        packet = protocol.receive(sock)
+        packet = protocol.decode_packet(data)
         if packet.cmd == protocol.CMD_SET_DIRECT:
             framebuffer[packet.flags] = protocol.decode_rgbw16(
                 packet.payload[:8])
