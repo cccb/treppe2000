@@ -92,7 +92,7 @@ def _write_frame(boards, frame):
 
 def recv_loop(boards, source):
     for data in source:
-        packet = protocol.decode_packet(source)
+        packet = protocol.decode_packet(data)
 
         if packet.cmd == protocol.CMD_SET_DIRECT:
             print("This command is currently not supported")
