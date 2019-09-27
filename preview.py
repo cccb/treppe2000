@@ -30,7 +30,8 @@ def open_socket(host="localhost", port=2334):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--port", default=DEFAULT_PORT)
+    parser.add_argument("-p", "--port", default=DEFAULT_PORT, type=int)
+    parser.add_argument("-t", "--gracetime", default=1.5, type=int)
 
     return parser.parse_args()
 
