@@ -112,9 +112,12 @@ def initialize_boards(serial_port, devices):
     This can fail. So, as long we don't have a
     driver - we repeat this.
     """
+    print("Waiting for boards...")
     while True:
         try:
-            return olsndots.Driver(serial_port, devices=devices)
+            driver = olsndots.Driver(serial_port, devices=devices)
+            print("Drivers initialized.")
+            return driver
         except:
             time.sleep(1)
 
@@ -132,8 +135,7 @@ def main(args):
         olsndots.Olsndot(0x23420002),
     ]
 
-    driver = initialize_boards(args.serial_port, boards) 
-    driver = olsndots.Driver(args.serial_port, devices=boards)
+    driver = initialize_boards(args.serial_port, boards)
 
     source = protocol.demultiplex_sockets(
         protocol.receive_sockets(sock_a, sock_b),
