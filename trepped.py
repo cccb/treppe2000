@@ -45,7 +45,7 @@ def _parse_args():
     parser.add_argument("-l", "--listen-port", default=LISTEN_PORT_DEFAULT)
     parser.add_argument("-p", "--serial-port", default=SERIAL_PORT_DEFAULT)
     parser.add_argument("-b", "--baudrate", default=SERIAL_BAUD_DEFAULT)
-    parser.add_argument("-t", "--gracetime", default=1.5, type=int)
+    parser.add_argument("-t", "--gracetime", default=1.5, type=float)
 
     return parser.parse_args()
 
@@ -76,6 +76,9 @@ def _write_frame(boards, frame):
     # FIXME: This kind of sucks.
     num_boards = len(boards)
     frame_size = len(frame)
+    if frame_size % 2 != 0:
+        return
+
     sub_frame_size = int(frame_size / num_boards)
 
     if len(frame) < max(CHANNEL_MAPPING) + 1:
