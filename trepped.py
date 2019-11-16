@@ -106,6 +106,19 @@ def recv_loop(boards, source):
         time.sleep(20e-6)
 
 
+def initialize_boards(serial_port, devices):
+    """
+    Initialize boards.
+    This can fail. So, as long we don't have a
+    driver - we repeat this.
+    """
+    while True:
+        try:
+            return olsndots.Driver(serial_port, devices=devices)
+        except:
+            time.sleep(1)
+
+
 def main(args):
     print("Listening on 0.0.0.0:{}".format(args.listen_port))
     print("Listening on 0.0.0.0:{} (priority)".format(args.listen_port+1))
@@ -119,6 +132,7 @@ def main(args):
         olsndots.Olsndot(0x23420002),
     ]
 
+    driver = initialize_boards(args.serial_port, boards) 
     driver = olsndots.Driver(args.serial_port, devices=boards)
 
     source = protocol.demultiplex_sockets(
