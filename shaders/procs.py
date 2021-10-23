@@ -26,10 +26,10 @@ def const_step(state):
 
 
 def const_colors(state):
-    c = [(0.0,0,0,0), (0.0,0.0,0,0), (0.0,0.3,0.0,0), (0.0,0.0,0,0.0),
-         (0.0,0,0,0), (0.0,0.0,0,0), (0.0,0,0.0,0), (0.0,0,0,0.0),
-         (0.0,0,0,0), (0.0,0.0,0,0), (0.0,0,0.0,0), (0,0,0,0.0),
-         (0.0,0,0,0), (0.0,0.0,0,0), (0.0,0,0.0,0), (0,0,0,0.0)]
+    c = [(1.0,0,0,0), (0.0,1.0,0,0), (0.0,0.0,1.0,0), (0.0,0.0,0,1.0),
+         (0.0,0,0,0), (0.0,1.0,0,0), (0.0,0,0.0,0), (0.0,0,0,0.0),
+         (0.0,0,0,0), (0.0,0.0,0,0), (1.0,0,0.0,0), (0,0,0,0.0),
+         (0.0,0,0,0), (0.0,0.0,0,0), (0.0,0,0.0,0), (0,0,0,1.0)]
 
     return c[state.v % 16]
 
@@ -159,7 +159,6 @@ def gauge_pulse(state):
 
 def flow_pulse(state):
     pulse_len = 4.5
-
     blue_base = 0.2 * gen.waber(1, 0, state)
 
     # hull parabola / outer fade
@@ -261,8 +260,36 @@ def synth_color_glow(state):
     colors = smooth_colors(state)
     glows = synth_glow(state)
 
-    return (0.5 * colors[0], 0.5 * colors[1], 0.5* colors[2], glows[3])
+    return (0.5 * colors[0], 0.5 * colors[1], 0.5 * colors[2], glows[3])
 
+
+def foo_pulse(state, pulse_len):
+    # hull parabola / outer fade
+    f_hull = fn.linear_window(-2, state.v_res + 1, state.v)
+    hull = fn.mix(0.1, 1.0, fn.parabola(8, f_hull))
+
+    # flowing pulse
+    v_pos = fn.linear_window_duration(1, pulse_len, state.t % (pulse_len * 1.5)) * (state.v_res + 8)
+    f_pulse = fn.linear_window(-8 + v_pos, 0 + v_pos, state.v)
+    pulse = fn.parabola(4, f_pulse) * hull
+    return pulse
+
+
+def foo_v(state, width, phase, speed):
+    h = float(state.v) / float(state.v_res)
+    osc = 0.5 * (1.0 + math.sin(state.t * speed))
+    osc2 = width * (0.5 + (osc*0.5))
+    v = 0.5*(1.0 + math.sin(math.pi * osc2 * h))
+    return v
+
+
+def foo1(state):
+    offset = 1.0/state.v_res
+    v1 = foo_v(state, 8.0, 0.0, 0.2)
+    v2 = foo_v(state, 10.0, offset, 0.3)
+    v3 = foo_v(state, 8.0, offset * 2.0, 0.3)
+    v4 = foo_pulse(state, 16.0)
+    return (0.5 * v1, 0.2 * v2, 0.22 * v3, v4)
 
 
 def krrr(state):
@@ -278,7 +305,6 @@ def krrr(state):
 
     duration = 0.07
 
-
     total_win_size = len(randomize) * duration
 
     select = math.floor((state.t % total_win_size) / duration)
@@ -291,6 +317,26 @@ def krrr(state):
         return (1, 0, 0,0)
 
     return (0,0,0,0)
+
+
+def palette2(state):
+    pal = [
+        [0.500, 0.500, 0.500, 0.0],
+        [0.500, 0.500, 0.500, 0.0],
+        [0.416, 0.416, 0.260, 0.0],
+        [-0.042, 0.158, 0.458, 0.0],
+    ]
+
+    # Background palette
+    pal_x = 1.0 - osc.linear(0.0, 1.0, state.v_res + 2, state.v)
+    rgb = fn.palette(*pal, pal_x)
+
+    rgb[0] *= 0.1
+    rgb[1] *= 0.1
+    rgb[2] *= 0.1
+    rgb[3] = 0
+
+    return rgb
 
 
 def palette_test(state):
@@ -322,5 +368,21 @@ def palette_test(state):
         return fn.palette(*p3, win - state.t)
 
 
-
-
+def tr(state):
+    colors = [
+        (1.0, 0.0, 0.0, 0.0),
+        (0.0, 1.0, 0.0, 0.0),
+        (0.0, 0.0, 1.0, 0.0),
+        (0.0, 0.0, 0.0, 1.0),
+        (0.0, 0.0, 1.0, 0.0),
+        (0.0, 1.0, 0.0, 0.0),
+        (1.0, 0.0, 0.0, 0.0),
+        (0.0, 1.0, 0.0, 0.0),
+        (0.0, 0.0, 1.0, 0.0),
+        (0.0, 0.0, 0.0, 1.0),
+        (0.0, 0.0, 1.0, 0.0),
+        (0.0, 1.0, 0.0, 0.0),
+        (1.0, 1.0, 1.0, 0.0),
+    ]
+    return colors[state.v % len(colors)]
+    

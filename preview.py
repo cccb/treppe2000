@@ -47,9 +47,9 @@ def draw_strip(ctx, i, color):
 
 
 def _map_rgbw(rgbw):
-    rgb = (min(rgbw[0] + rgbw[3], 1.0),
-           min(rgbw[1] + rgbw[3], 1.0),
-           min(rgbw[2] + rgbw[3], 1.0))
+    rgb = (min(rgbw[0] + 0.5*rgbw[3], 1.0),
+           min(rgbw[1] + 0.5*rgbw[3], 1.0),
+           min(rgbw[2] + 0.5*rgbw[3], 1.0))
 
     return (round(rgb[0] * 255.0),
             round(rgb[1] * 255.0),
@@ -92,7 +92,8 @@ def main(args):
         # check for quit events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit(); sys.exit();
+                pygame.quit()
+                sys.exit()
 
 
         # Read from socket

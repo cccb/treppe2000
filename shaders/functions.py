@@ -240,3 +240,5 @@ def palette(a, b, c, d, t):
             a[1] + b[1] * math.cos(6.28318 * (c[1] * t + d[1])),
             a[2] + b[2] * math.cos(6.28318 * (c[2] * t + d[2])),
             a[3] + b[3] * math.cos(6.28318 * (c[3] * t + d[3])))
+
+
