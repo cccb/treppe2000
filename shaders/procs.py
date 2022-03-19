@@ -386,3 +386,111 @@ def tr(state):
     ]
     return colors[state.v % len(colors)]
     
+
+def trans_pride(state):
+    blue = (0.33, 0.8, 0.98, 0.0)
+    pink = (0.96, 0.65, 0.72, 0.0)
+    white = (0, 0, 0, 0.9)
+
+    colors = [
+        blue,
+        blue,
+        pink,
+        pink,
+        pink,
+        white,
+        white,
+        pink,
+        pink,
+        pink,
+        blue,
+        blue,
+        blue,
+    ]
+    rgb = colors[state.v % len(colors)]
+
+    rgb[0] *= 0.1
+    rgb[1] *= 0.1
+    rgb[2] *= 0.1
+    rgb[3] = 0
+
+    return rgb
+
+
+def palette_test(state):
+    p1 = [(0.5,0.5,0.5,0.0),
+          (0.5,0.5,0.5,0.0),
+          (2.0,1.0,0.0,0.0),
+          (0.5,0.20,0.25,0.0)]
+
+    p2 = [(0.5,0.5,0.5,0.0),
+          (0.5,0.5,0.5,0.0),
+          (1.0,1.0,1.0,0.0),
+          (0.0,0.10,0.20, 0.0)]
+
+    p3 = [(0.5,0.5,0.5,0.0),
+          (0.5,0.5,0.5,0.0),
+          (1.0,1.0,1.0,0.0),
+          (0.3,0.20,0.20,0.0)]
+
+    win = fn.linear_window(0, state.v_res, state.v)
+
+    t_win = state.t % 30
+    if t_win < 10:
+        return fn.palette(*p1, win - state.t)
+
+    if t_win < 20:
+        return fn.palette(*p2, win - state.t)
+
+    if t_win < 30:
+        return fn.palette(*p3, win - state.t)
+
+
+def tr(state):
+    colors = [
+        (1.0, 0.0, 0.0, 0.0),
+        (0.0, 1.0, 0.0, 0.0),
+        (0.0, 0.0, 1.0, 0.0),
+        (0.0, 0.0, 0.0, 1.0),
+        (0.0, 0.0, 1.0, 0.0),
+        (0.0, 1.0, 0.0, 0.0),
+        (1.0, 0.0, 0.0, 0.0),
+        (0.0, 1.0, 0.0, 0.0),
+        (0.0, 0.0, 1.0, 0.0),
+        (0.0, 0.0, 0.0, 1.0),
+        (0.0, 0.0, 1.0, 0.0),
+        (0.0, 1.0, 0.0, 0.0),
+        (1.0, 1.0, 1.0, 0.0),
+    ]
+    return colors[state.v % len(colors)]
+    
+
+def trans_pride(state):
+    blue = [0.13, 0.4, 0.98, 0.03]
+    pink = [0.99, 0.15, 0.22, 0.1]
+    white = [0, 0.5, 0.5, 0.4]
+
+    colors = [
+        blue,
+        blue,
+        pink,
+        pink,
+        pink,
+        white,
+        white,
+        pink,
+        pink,
+        pink,
+        blue,
+        blue,
+        blue,
+    ]
+    rgb = colors[state.v % len(colors)]
+
+    rgb[0] *= 0.08
+    rgb[1] *= 0.08
+    rgb[2] *= 0.08
+    rgb[3] *= 0.3
+
+    return rgb
+
