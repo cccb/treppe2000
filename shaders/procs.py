@@ -34,7 +34,7 @@ def const_colors(state):
     return c[state.v % 16]
 
 
-def smooth_colors(state):
+def smooth_colors_old(state):
     offset = (state.v / 6.5) * math.pi
 
     r = 0.5 + 0.5 * math.cos(2.0 * state.t + 2 + offset)
@@ -43,6 +43,16 @@ def smooth_colors(state):
     w = 0.1
 
     return (0, r, g, b)
+
+def smooth_colors(state):
+    offset = (state.v / 6.5) * math.pi
+    slow = 1.0 - 0.3333333333333333333
+    r = 0.5 + 0.5 * math.cos(2.0 * -state.t*slow + 2 + offset)
+    g = 0.5 + 0.5 * math.cos(2.0 * -state.t*slow + 3 + offset)
+    b = 0.5 + 0.5 * math.cos(2.0 * -state.t*slow + 4 + offset)
+    w = 0.1
+    return (r*0.071, g*0.071, b*0.071, w*0.071)
+
 
 
 def color_flow(state):
@@ -463,7 +473,7 @@ def tr(state):
         (1.0, 1.0, 1.0, 0.0),
     ]
     return colors[state.v % len(colors)]
-    
+
 
 def trans_pride(state):
     blue = [0.13, 0.4, 0.98, 0.03]
@@ -493,4 +503,36 @@ def trans_pride(state):
     rgb[3] *= 0.3
 
     return rgb
+
+
+def tflow(state):
+    """fade between two shaders"""
+    flow = smooth_colors(state)
+    pride = trans_pride(state)
+
+    w = 120.0 # window seconds
+    n = 20.0 # segments
+    twin = state.t % w
+    tseg = twin % (w / n)
+    seg = int(twin / (w / n))
+    fseg = tseg / ( w / n)
+
+    if seg == 0:
+        # fade from flow to pride
+        hull = fn.interpolate_cosine(0, 1, fseg)
+    elif seg < 5:
+        hull = 1.0
+        # keep
+    elif seg == 5:
+        # fade from pride to flow
+        hull = fn.interpolate_cosine(1, 0, fseg)
+    elif seg > 5:
+        hull = 0.0
+
+    rgb = [
+        (flow[i] * (1 - hull) + pride[i] * hull)
+        for i in range(4)
+    ]
+    return rgb
+
 
