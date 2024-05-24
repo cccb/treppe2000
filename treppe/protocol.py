@@ -251,3 +251,10 @@ def cmd_frame_rgbw16(frame):
               encode_frame_rgbw16(frame)
 
     return payload
+
+
+def cmd_frame_rgb8(frame):
+    payload = bytes([CMD_FRAME, FLAG_RGB|FLAG_BITS_8]) + \
+              encode_frame_rgb8(frame)
+
+    return payload
